@@ -3,7 +3,8 @@
 const ALUNOS = [
   { id: 'anderson', nome: 'Anderson', inicial: 'A', cor: 'violet' },
   { id: 'luiza', nome: 'Luiza', inicial: 'L', cor: 'peach' },
-  { id: 'jovana', nome: 'Jovana', inicial: 'J', cor: 'mint' }
+  // ID histórico preservado: links e progresso local continuam válidos.
+  { id: 'jovana', nome: 'Giovana', inicial: 'G', cor: 'mint' }
 ];
 
 const CHAPTERS = window.CHAPTERS || [];
@@ -126,7 +127,6 @@ function initQuiz() {
   }
   let selected = null;
   $('#quiz-titulo').textContent = capitulo.titulo;
-  $('#total-quiz').textContent = String(total).padStart(2, '0');
   const optionsContainer = $('#opcoes');
   const feedback = $('#feedback');
   const botaoConfirmar = $('#confirmar-resposta');
