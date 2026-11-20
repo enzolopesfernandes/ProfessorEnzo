@@ -19,12 +19,17 @@ function getCapitulosAluno(aluno) {
   return CHAPTERS.filter(capitulo => !capitulo.alunos || capitulo.alunos.includes(aluno.id)).reverse();
 }
 function getParams() { return new URLSearchParams(window.location.search); }
-function rota(pagina, aluno, capitulo = CHAPTERS[0]?.id || 'revisao-final') {
+function rota(pagina, aluno, capitulo) {
   if (pagina === 'index') return 'index.html';
-  const params = new URLSearchParams({ aluno, capitulo });
+  const params = new URLSearchParams({ aluno });
+  if (capitulo) params.set('capitulo', capitulo);
   return `${pagina}.html?${params.toString()}`;
 }
-function keyState(aluno, capitulo) { return `${STORAGE_PREFIX}${aluno}:${capitulo}`; }
+// Reedições de um capítulo ganham nova chave para não reaproveitar respostas antigas.
+function keyState(aluno, capitulo) {
+  const versao = getCapitulo(capitulo)?.versao;
+  return `${STORAGE_PREFIX}${aluno}:${capitulo}${versao ? ':v' + versao : ''}`;
+}
 function loadState(aluno, capitulo) {
   try {
     const raw = localStorage.getItem(keyState(aluno, capitulo));
@@ -47,7 +52,10 @@ function countCorrect(capitulo, state) {
     const resposta = state.respostas[index];
     const acertou = q.tipo === 'aberta'
       ? resposta && resposta.avaliacao === 'acertou'
-      : resposta === q.correta;
+      : q.tipo === 'sequencia'
+        ? Array.isArray(resposta) && resposta.length === q.respostasCorretas.length
+          && q.respostasCorretas.every((valor, i) => resposta[i] === valor)
+        : resposta === q.correta;
     return total + (acertou ? 1 : 0);
   }, 0);
 }
@@ -74,9 +82,9 @@ function svgIcon(name, size = 20) {
 function getContext() {
   const p = getParams();
   const aluno = getAluno(p.get('aluno'));
+  if (!aluno) { window.location.replace('index.html'); return null; }
   const disponiveis = getCapitulosAluno(aluno);
-  const capitulo = disponiveis.find(item => item.id === p.get('capitulo')) || disponiveis[0];
-  if (!aluno || !capitulo) { window.location.replace('index.html'); return null; }
+  const capitulo = disponiveis.find(item => item.id === p.get('capitulo')) || disponiveis[0] || null;
   return { aluno, capitulo };
 }
 function setNomeAluno(aluno) {
@@ -89,13 +97,14 @@ function initHome() {
   const container = $('#alunos-grid');
   for (const aluno of ALUNOS) {
     const capitulo = getCapitulosAluno(aluno)[0];
-    const state = loadState(aluno.id, capitulo.id);
-    const respondidas = Math.min(state.respostas.length, capitulo.questoes.length);
-    const mensagem = state.concluido
-      ? capitulo.questoes.some(q => q.tipo === 'aberta')
-        ? `Revisão concluída · ${countCorrect(capitulo, state)} de ${capitulo.questoes.length} resolvidas na autoavaliação`
-        : `Revisão concluída · ${countCorrect(capitulo, state)} de ${capitulo.questoes.length} acertos`
-      : respondidas > 0 ? `${respondidas} de ${capitulo.questoes.length} questões respondidas` : 'Atividades disponíveis';
+    const state = capitulo ? loadState(aluno.id, capitulo.id) : null;
+    const respondidas = state ? Math.min(state.respostas.length, capitulo.questoes.length) : 0;
+    const mensagem = !capitulo ? 'Nenhuma atividade disponível no momento'
+      : state.concluido
+        ? capitulo.questoes.some(q => q.tipo === 'aberta')
+          ? `Revisão concluída · ${countCorrect(capitulo, state)} de ${capitulo.questoes.length} concluídas com sucesso`
+          : `Revisão concluída · ${countCorrect(capitulo, state)} de ${capitulo.questoes.length} acertos`
+        : respondidas > 0 ? `${respondidas} de ${capitulo.questoes.length} questões respondidas` : 'Atividades disponíveis';
     const a = elem('a', `aluno-card aluno-${aluno.cor}`);
     a.href = rota('capitulos', aluno.id);
     a.setAttribute('aria-label', `Abrir atividades de ${aluno.nome}`);
@@ -112,6 +121,10 @@ function initCapitulos() {
   setNomeAluno(aluno);
   const lista = $('#capitulos-lista');
   const capitulos = getCapitulosAluno(aluno);
+  if (!capitulos.length) {
+    lista.append(elem('p', 'empty-activities', 'Ainda não há atividades cadastradas para você.'));
+    return;
+  }
   for (const capitulo of capitulos) {
     const state = loadState(aluno.id, capitulo.id);
     const total = capitulo.questoes.length;
@@ -119,7 +132,7 @@ function initCapitulos() {
     const progresso = Math.round(respondidas / Math.max(total, 1) * 100);
     const card = elem('article', 'chapter-card');
     card.innerHTML = '<div class="chapter-top"><span class="chapter-tag"></span></div><h2 class="chapter-name"></h2><p class="chapter-subtitle"></p><p class="chapter-desc"></p><div class="chapter-info"><span class="chapter-total"></span><span>Correção comentada</span></div><div class="progress-metadata"><strong>Seu progresso</strong><span class="chapter-progress-text"></span></div><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill"></div></div><div class="chapter-actions"><a class="btn btn-primary chapter-start" href="#"></a><a class="btn btn-outline chapter-result" href="#" hidden>Ver resultado</a></div>';
-    $('.chapter-tag', card).textContent = capitulo.id === 'revisao-final' ? 'Atividade de exemplo' : 'Matemática · 7º ano';
+    $('.chapter-tag', card).textContent = capitulo.subtitulo || 'Atividade';
     $('.chapter-name', card).textContent = capitulo.titulo;
     $('.chapter-subtitle', card).textContent = capitulo.subtitulo;
     $('.chapter-desc', card).textContent = capitulo.descricao;
@@ -147,8 +160,10 @@ function initQuiz() {
   const ctx = getContext(); if (!ctx) return;
   const { aluno, capitulo } = ctx;
   setNomeAluno(aluno);
+  if (!capitulo || !capitulo.questoes.length) {
+    window.location.replace(rota('capitulos', aluno.id)); return;
+  }
   const total = capitulo.questoes.length;
-  if (!total) { window.location.replace(rota('capitulos', aluno.id)); return; }
   let state = loadState(aluno.id, capitulo.id);
   if (state.concluido || state.indice >= total) {
     window.location.replace(rota('resultado', aluno.id, capitulo.id)); return;
@@ -169,11 +184,14 @@ function initQuiz() {
     const index = state.indice;
     const questao = capitulo.questoes[index];
     const aberta = questao.tipo === 'aberta';
+    const sequencia = questao.tipo === 'sequencia';
     const resposta = state.respostas[index];
     const confirmed = aberta
       ? !!(resposta && typeof resposta === 'object' && typeof resposta.texto === 'string')
-      : Number.isInteger(resposta);
-    selected = aberta ? null : confirmed ? resposta : null;
+      : sequencia
+        ? Array.isArray(resposta) && resposta.length === questao.itens.length
+        : Number.isInteger(resposta);
+    selected = aberta || sequencia ? null : confirmed ? resposta : null;
     $('#questao-numero').textContent = String(index + 1).padStart(2, '0');
     $('#questao-contador').textContent = `Questão ${index + 1} de ${total}`;
     $('#progresso-quiz').style.width = `${(state.respostas.length / total) * 100}%`;
@@ -190,6 +208,9 @@ function initQuiz() {
     } else {
       $('#grafico-questao').hidden = true;
     }
+    if (questao.figura && typeof window.renderDiagramaQuestao === 'function') {
+      window.renderDiagramaQuestao($('#grafico-questao'), questao.figura);
+    }
 
     optionsContainer.hidden = aberta;
     answerWrap.hidden = !aberta;
@@ -201,6 +222,30 @@ function initQuiz() {
       btnAcertou.setAttribute('aria-pressed', String(!!(confirmed && resposta.avaliacao === 'acertou')));
       btnRevisar.setAttribute('aria-pressed', String(!!(confirmed && resposta.avaliacao === 'revisar')));
       botaoConfirmar.innerHTML = `Conferir resposta ${svgIcon('arrow', 18)}`;
+    } else if (sequencia) {
+      botaoConfirmar.innerHTML = `Conferir sequência ${svgIcon('arrow', 18)}`;
+      questao.itens.forEach((item, i) => {
+        const row = elem('label', 'sequence-row');
+        const statement = elem('span', 'sequence-statement', item);
+        const select = elem('select', 'sequence-select');
+        select.setAttribute('aria-label', `Resposta do item ${i + 1}`);
+        const placeholder = elem('option', '', 'Escolha');
+        placeholder.value = '';
+        select.append(placeholder);
+        questao.valoresResposta.forEach(valor => {
+          const option = elem('option', '', valor);
+          option.value = valor;
+          select.append(option);
+        });
+        select.value = confirmed ? resposta[i] : '';
+        select.disabled = confirmed;
+        if (confirmed) row.classList.add(resposta[i] === questao.respostasCorretas[i] ? 'sequence-correct' : 'sequence-wrong');
+        select.addEventListener('change', () => {
+          botaoConfirmar.disabled = [...optionsContainer.querySelectorAll('select')].some(field => !field.value);
+        });
+        row.append(statement, select);
+        optionsContainer.append(row);
+      });
     } else {
       botaoConfirmar.innerHTML = `Confirmar resposta ${svgIcon('arrow', 18)}`;
       questao.alternativas.forEach((alternativa, idx) => {
@@ -234,7 +279,9 @@ function initQuiz() {
       });
     }
     botaoConfirmar.hidden = confirmed;
-    botaoConfirmar.disabled = aberta ? !textarea.value.trim() : selected === null;
+    botaoConfirmar.disabled = aberta ? !textarea.value.trim()
+      : sequencia ? [...optionsContainer.querySelectorAll('select')].some(field => !field.value)
+      : selected === null;
     botaoProximo.hidden = !confirmed;
     botaoProximo.disabled = aberta ? !(confirmed && resposta.avaliacao) : false;
     botaoProximo.innerHTML = index === total - 1 ? `Ver meu resultado ${svgIcon('arrow', 18)}` : `Próxima questão ${svgIcon('arrow', 18)}`;
@@ -246,13 +293,16 @@ function initQuiz() {
         $('#feedback-titulo').textContent = 'Confira a resolução';
         $('#feedback-descricao').textContent = 'Compare com o que você escreveu e indique como se saiu.';
       } else {
-        const acertou = selected === questao.correta;
+        const acertou = sequencia
+          ? questao.respostasCorretas.every((valor, i) => resposta[i] === valor)
+          : selected === questao.correta;
         feedback.className = `feedback ${acertou ? 'feedback-certo' : 'feedback-errado'}`;
         $('#feedback-icone').innerHTML = svgIcon(acertou ? 'check' : 'x', 19);
-        $('#feedback-titulo').textContent = acertou ? 'Muito bem! Você acertou.' : 'Ainda não! Vamos entender.';
+        $('#feedback-titulo').textContent = acertou ? 'Muito bem! Você acertou.' : 'Confira o que precisa revisar.';
         $('#feedback-descricao').textContent = acertou
           ? 'Confira a resolução para reforçar o aprendizado.'
-          : `Resposta correta: ${String.fromCharCode(65 + questao.correta)}. ${questao.alternativas[questao.correta]}`;
+          : sequencia ? `Sequência correta: ${questao.respostasCorretas.join(', ')}`
+            : `Resposta correta: ${String.fromCharCode(65 + questao.correta)}. ${questao.alternativas[questao.correta]}`;
       }
       $('#resolucao').textContent = questao.resolucao;
     }
@@ -282,6 +332,10 @@ function initQuiz() {
       const texto = textarea.value.trim();
       if (!texto) return;
       state.respostas[state.indice] = { texto, avaliacao: null };
+    } else if (questao.tipo === 'sequencia') {
+      const values = [...optionsContainer.querySelectorAll('select')].map(field => field.value);
+      if (values.length !== questao.itens.length || values.some(value => !value)) return;
+      state.respostas[state.indice] = values;
     } else {
       if (selected === null) return;
       state.respostas[state.indice] = selected;
@@ -295,7 +349,9 @@ function initQuiz() {
     const resposta = state.respostas[state.indice];
     const answered = questao.tipo === 'aberta'
       ? !!(resposta && resposta.avaliacao)
-      : Number.isInteger(resposta);
+      : questao.tipo === 'sequencia'
+        ? Array.isArray(resposta) && resposta.length === questao.itens.length
+        : Number.isInteger(resposta);
     if (!answered) return;
     if (state.indice === total - 1) {
       state.concluido = true;
@@ -316,6 +372,9 @@ function initResultado() {
   const ctx = getContext(); if (!ctx) return;
   const { aluno, capitulo } = ctx;
   setNomeAluno(aluno);
+  if (!capitulo || !capitulo.questoes.length) {
+    window.location.replace(rota('capitulos', aluno.id)); return;
+  }
   const state = loadState(aluno.id, capitulo.id);
   const total = capitulo.questoes.length;
   if (!state.concluido || state.respostas.length !== total) {
@@ -326,9 +385,9 @@ function initResultado() {
   const aberta = capitulo.questoes.some(questao => questao.tipo === 'aberta');
   const percentual = Math.round((acertos / Math.max(total, 1)) * 100);
   if (aberta) {
-    $('#rotulo-percentual').textContent = 'na sua autoavaliação';
-    $('#rotulo-acertos').textContent = 'Consegui resolver';
-    $('#rotulo-erros').textContent = 'Preciso revisar';
+    $('#rotulo-percentual').textContent = 'de desempenho (inclui autoavaliação)';
+    $('#rotulo-acertos').textContent = 'Acertos/Resolvidas';
+    $('#rotulo-erros').textContent = 'Erros/A revisar';
   }
   $('#score-percentual').textContent = `${percentual}%`;
   $('#score-circulo').style.setProperty('--percentual', `${percentual}%`);
@@ -336,7 +395,7 @@ function initResultado() {
   $('#score-erros').textContent = String(erros);
   $('#score-total').textContent = String(total);
   $('#mensagem-resultado').textContent = aberta
-    ? 'Sua autoavaliação ajuda a identificar o que revisar.'
+    ? 'O resultado combina questões corrigidas automaticamente e suas autoavaliações.'
     : percentual === 100 ? 'Excelente! Você acertou todas as questões.'
     : percentual >= 70 ? 'Ótimo trabalho! Continue praticando.'
     : 'Cada questão é uma chance de aprender mais.';
@@ -344,15 +403,22 @@ function initResultado() {
   capitulo.questoes.forEach((questao, index) => {
     const resposta = state.respostas[index];
     const isOpen = questao.tipo === 'aberta';
-    const isCorrect = isOpen ? resposta.avaliacao === 'acertou' : resposta === questao.correta;
+    const isSeq = questao.tipo === 'sequencia';
+    const isCorrect = isOpen ? resposta.avaliacao === 'acertou'
+      : isSeq ? Array.isArray(resposta) && questao.respostasCorretas.every((valor, i) => resposta[i] === valor)
+      : resposta === questao.correta;
     const item = elem('details', `resumo-questao ${isCorrect ? 'resumo-certo' : 'resumo-errado'}`);
     const summary = elem('summary', 'resumo-cabecalho');
     summary.innerHTML = `<span class="resumo-status">${svgIcon(isCorrect ? 'check' : 'x', 16)}</span><span class="resumo-titulo"></span><span class="resumo-badge">${isOpen ? (isCorrect ? 'Resolvida' : 'Revisar') : (isCorrect ? 'Correta' : 'Incorreta')}</span><span class="resumo-chevron">⌄</span>`;
     $('.resumo-titulo', summary).textContent = `Questão ${String(index + 1).padStart(2, '0')} · ${questao.assunto}`;
     const body = elem('div', 'resumo-conteudo');
     const question = elem('p', 'resumo-enunciado', questao.enunciado);
-    const sua = elem('p', 'resumo-sua-resposta', isOpen ? `Sua resposta: ${resposta.texto}` : `Sua resposta: ${questao.alternativas[resposta]}`);
-    const certa = isOpen ? elem('p', '', 'Resolução comentada:') : elem('p', '', `Resposta correta: ${questao.alternativas[questao.correta]}`);
+    const sua = elem('p', 'resumo-sua-resposta', isOpen ? `Sua resposta: ${resposta.texto}`
+      : isSeq ? `Sua sequência: ${resposta.join(', ')}`
+      : `Sua resposta: ${questao.alternativas[resposta]}`);
+    const certa = isOpen ? elem('p', '', 'Resolução comentada:')
+      : isSeq ? elem('p', '', `Sequência correta: ${questao.respostasCorretas.join(', ')}`)
+      : elem('p', '', `Resposta correta: ${questao.alternativas[questao.correta]}`);
     const resolucao = elem('p', 'resumo-explicacao', questao.resolucao);
     body.append(question, sua, certa, resolucao);
     item.append(summary, body);

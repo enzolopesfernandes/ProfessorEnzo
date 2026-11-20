@@ -149,3 +149,74 @@
     dataTable(figure,chart);container.append(figure);
   };
 })();
+
+
+/* Diagramas das questões do 6º ano: valores e relógios do material original. */
+(function () {
+  'use strict';
+  const ns = 'http://www.w3.org/2000/svg';
+  function E(tag, classe, text) {
+    const node = document.createElement(tag);
+    if (classe) node.className = classe;
+    if (text !== undefined) node.textContent = String(text);
+    return node;
+  }
+  function clock(label, hour, minute) {
+    const wrap = E('div', 'exercise-clock-item');
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 164 164');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', label + ': ' + hour + ' h ' + String(minute).padStart(2, '0') + ' min');
+    function node(tag, props, value) {
+      const n = document.createElementNS(ns, tag);
+      Object.entries(props).forEach(([k, v]) => n.setAttribute(k, String(v)));
+      if (value !== undefined) n.textContent = String(value);
+      svg.append(n);
+    }
+    node('circle', {cx:82,cy:82,r:73,fill:'#ffffff',stroke:'#315069','stroke-width':2});
+    for (let i=1;i<=12;i++) {
+      const a = i * Math.PI / 6 - Math.PI / 2;
+      node('text',{x:82+59*Math.cos(a),y:82+59*Math.sin(a)+4,'font-size':12,'text-anchor':'middle',fill:'#29445c'},i);
+    }
+    const minuteAngle = minute*Math.PI/30 - Math.PI/2;
+    const hourAngle = (hour%12 + minute/60)*Math.PI/6 - Math.PI/2;
+    node('line',{x1:82,y1:82,x2:82+38*Math.cos(hourAngle),y2:82+38*Math.sin(hourAngle),stroke:'#23384f','stroke-width':5,'stroke-linecap':'round'});
+    node('line',{x1:82,y1:82,x2:82+54*Math.cos(minuteAngle),y2:82+54*Math.sin(minuteAngle),stroke:'#437e89','stroke-width':3,'stroke-linecap':'round'});
+    node('circle',{cx:82,cy:82,r:4,fill:'#23384f'});
+    wrap.append(svg, E('span','exercise-clock-label',label));
+    return wrap;
+  }
+  window.renderDiagramaQuestao = function renderDiagramaQuestao(container, figure) {
+    if (!figure) return;
+    container.replaceChildren();
+    container.hidden = false;
+    const outer = E('figure', 'exercise-figure');
+    if (figure.tipo === 'malha') {
+      const grid = E('div', 'exercise-grid');
+      grid.style.setProperty('--grid-cols', figure.colunas);
+      figure.preenchidos.forEach(filled => {
+        for (let c=0;c<figure.colunas;c++) {
+          const cell = E('span', 'exercise-cell');
+          if (c < filled) cell.classList.add('exercise-cell-filled');
+          grid.append(cell);
+        }
+      });
+      outer.append(grid, E('figcaption', 'exercise-figure-caption', figure.legenda));
+    } else if (figure.tipo === 'blocos') {
+      const box = E('div', 'exercise-data-grid');
+      figure.dados.forEach(([label,value]) => {
+        const item=E('div','exercise-data-card');
+        item.append(E('span','exercise-data-label',label),E('strong','exercise-data-value',value));
+        box.append(item);
+      });
+      outer.append(box);
+    } else if (figure.tipo === 'relogios') {
+      const clocks=E('div','exercise-clocks');
+      figure.dados.forEach(([label,h,m]) => clocks.append(clock(label,h,m)));
+      outer.append(clocks);
+    } else {
+      container.hidden = true; return;
+    }
+    container.append(outer);
+  };
+})();

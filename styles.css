@@ -398,3 +398,54 @@ button:disabled { cursor: not-allowed; }
   .self-check-actions .btn { width: 100%; }
   .result-stats .stat span { overflow-wrap: anywhere; }
 }
+
+
+/* Revisões reais do dia 23/11: diferentes formatos, responsividade e estados claros */
+.empty-activities {
+  width: 100%; margin: 0; padding: 28px;
+  color: var(--subtle); background: #fff;
+  border: 1px solid var(--line); border-radius: 14px;
+  font-size: 14px;
+}
+.sequence-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; min-width: 0; border: 1px solid var(--line);
+  background: #fff; border-radius: 11px; padding: 14px;
+}
+.sequence-statement { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; }
+.sequence-select {
+  min-width: 110px; max-width: 180px; padding: 10px 12px;
+  background: #fff; color: var(--ink); border: 1px solid #bbc7d8;
+  border-radius: 8px; font: inherit; font-size: 14px;
+}
+.sequence-select:focus-visible { outline: 3px solid #8d9cf7; outline-offset: 2px; }
+.sequence-correct { border-color: #a2d4b9; background: #f0faf4; }
+.sequence-wrong { border-color: #edb9b9; background: #fff6f6; }
+.sequence-select:disabled { color: #25354f; opacity: 1; }
+.exercise-figure { margin: 18px 0 22px; padding: 20px 16px; background: #f9fbfe; border: 1px solid var(--line); border-radius: 12px; }
+.exercise-figure-caption { margin-top: 12px; text-align: center; font-size: 12px; color: var(--subtle); }
+.exercise-grid {
+  display: grid; grid-template-columns: repeat(var(--grid-cols, 6), minmax(0, 1fr));
+  width: min(100%, 300px); margin: 0 auto; border-top: 1px solid #9da9b7; border-left: 1px solid #9da9b7;
+}
+.exercise-cell { aspect-ratio: 1.3; background: #fff; border-bottom: 1px solid #9da9b7; border-right: 1px solid #9da9b7; }
+.exercise-cell-filled { background: #b8cbd0; }
+.exercise-data-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.exercise-data-card {
+  display: grid; align-content: center; gap: 5px; min-width: min(100%, 135px);
+  min-height: 76px; padding: 13px 18px; text-align: center;
+  border: 1px solid #becbd3; border-radius: 8px; background: #fff;
+}
+.exercise-data-label { font-size: 12px; color: var(--subtle); }
+.exercise-data-value { font-size: 16px; color: var(--ink); }
+.exercise-clocks { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+.exercise-clock-item { display: flex; flex-direction: column; align-items: center; gap: 4px; width: min(42%, 185px); }
+.exercise-clock-item svg { display: block; width: 100%; height: auto; }
+.exercise-clock-label { font-size: 13px; font-weight: 700; color: var(--subtle); }
+@media (max-width: 600px) {
+  .sequence-row { align-items: stretch; flex-direction: column; gap: 10px; padding: 12px; }
+  .sequence-select { width: 100%; max-width: none; min-height: 46px; }
+  .exercise-figure { padding: 14px 11px; }
+  .exercise-data-card { flex: 1 1 100px; padding: 10px 12px; min-width: 0; }
+  .exercise-clock-item { width: min(45%, 170px); }
+}
