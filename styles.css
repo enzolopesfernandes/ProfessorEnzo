@@ -449,3 +449,34 @@ button:disabled { cursor: not-allowed; }
   .exercise-data-card { flex: 1 1 100px; padding: 10px 12px; min-width: 0; }
   .exercise-clock-item { width: min(45%, 170px); }
 }
+
+/* Reinício seguro e discreto das atividades sequenciais. */
+.quiz-meta-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.quiz-reset-button {
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--subtle);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.quiz-reset-button:hover { background: #f3f6fa; color: var(--ink); }
+.quiz-reset-button:focus-visible {
+  outline: 3px solid #8d9cf7;
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  .quiz-meta-controls { width: 100%; justify-content: space-between; }
+  .quiz-reset-button { min-height: 44px; }
+  .chapter-reset { flex: 1 1 100%; }
+}
