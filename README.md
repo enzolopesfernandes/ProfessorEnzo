@@ -43,6 +43,12 @@ A revisão da Luiza usa `versao: 2`, porque seu conteúdo foi substituído. Isso
 
 Execute `node tests/validar-questoes.cjs` no repositório para validar quantidade, IDs, tipos, respostas, gráficos e exclusividade por aluno. O site continua estático e dispensa build.
 
+## Reiniciar uma atividade
+
+Quando uma revisão tiver respostas salvas, a lista de capítulos mostra **Reiniciar atividade** ao lado de **Continuar revisão** (ou **Ver resultado** se estiver concluída). Durante a revisão, o botão **Reiniciar atividade** aparece junto ao progresso depois de uma resposta confirmada. A tela de resultado oferece **Refazer atividade**.
+
+Todas as opções solicitam confirmação antes de reiniciar. Ao confirmar, somente o progresso daquela atividade e daquele aluno é zerado no navegador: índice, respostas e estado de conclusão. Cancelar mantém as respostas existentes. As demais atividades permanecem intactas.
+
 ## Importante sobre resultados
 
 Os resultados ficam salvos **apenas no armazenamento local (localStorage) do navegador e do aparelho em que o quiz foi respondido**. Não há banco de dados nem login. Os resultados NÃO são enviados automaticamente ao professor, nem sincronizados entre dispositivos. Este é um protótipo para prática e validação visual. Para acompanhar notas remotamente, use um banco de dados e autenticação (por exemplo, Supabase ou Firebase) e cuide da privacidade de menores, quando aplicável.
