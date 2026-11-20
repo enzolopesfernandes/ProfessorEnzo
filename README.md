@@ -16,32 +16,28 @@ Protótipo funcional, responsivo e 100% estático, pronto para GitHub + Netlify.
 3. Este projeto não precisa de comando de build. Deixe a pasta de publicação como a raiz do projeto (`.`), se o painel solicitar.
 4. Publique. Os próximos commits na branch configurada poderão publicar automaticamente novas versões.
 
-## Adicionando questões
+## Atividades ativas
 
-Abra o arquivo `questions.js`. Dentro de `window.CHAPTERS`, cada capítulo tem `id`, `titulo`, `subtitulo`, `descricao` e uma lista `questoes`. Exemplo:
+- **Luiza:** `questions-luiza-23-11.js` — “Revisão prova 23/11”, Matemática do 7º ano, 40 questões. Versão atualizada com 20 questões de múltipla escolha, 8 de associação/verdadeiro ou falso e 12 abertas, acompanhadas de gabarito comentado. Gráficos reconstruídos no `graficos.js`.
+- **Anderson:** `questions-anderson-23-11.js` — “Revisão Matemática (23/11)”, Matemática do 6º ano, 40 questões com cinco alternativas, gabarito e resolução. As figuras necessárias para questões que dependem de leitura visual são reconstruídas por `graficos.js`.
+- **Giovana:** perfil mantido, atualmente sem atividades; a interface informa que ainda não há atividades disponíveis.
 
-```js
-{
-  id: 'q-nova',
-  assunto: 'Matemática',
-  enunciado: 'Quanto é 5 + 3?',
-  alternativas: ['6', '7', '8', '9'],
-  correta: 2, // posição da alternativa certa: 0 = A, 1 = B, 2 = C, 3 = D
-  resolucao: '5 + 3 = 8.'
-}
-```
+**As seis questões de teste foram removidas.** O antigo arquivo `questions.js` deixou de ser carregado.
 
-Para adicionar novos capítulos, inclua novos objetos no array `window.CHAPTERS` ou em um arquivo adicional carregado após `questions.js`. A página de capítulos agora lista automaticamente as atividades disponíveis. Um capítulo com `alunos: ['luiza']` será exibido apenas para Luiza; sem esse campo, ficará disponível para todos os alunos.
+## Adicionar novas atividades
 
-### Revisão de Luiza — prova 23/11
+As páginas HTML carregam os arquivos `questions-*.js` antes de `app.js`. Cada arquivo acrescenta um capítulo a `window.CHAPTERS`, com `id`, `titulo`, `subtitulo`, `descricao`, `alunos` e `questoes`.
 
-A atividade de Matemática do 7º ano fica em `questions-luiza-23-11.js` e reúne 40 questões originais, com subitens e resolução comentada. Os sete gráficos são renderizados por `graficos.js`, com uma tabela opcional de dados para acessibilidade.
+Use `alunos: ['luiza']` ou `alunos: ['anderson']` para restringir a atividade a um aluno. Sem `alunos`, a atividade é mostrada a todos.
 
-As questões discursivas usam `tipo: 'aberta'`. A estudante escreve a resposta, confere a resolução e marca **Consegui resolver** ou **Preciso revisar**. O percentual final dessas questões é **autoavaliado**, e não uma nota atribuída automaticamente. As questões de múltipla escolha continuam com correção automática.
+Os formatos atuais são:
+- `tipo: 'multipla_escolha'`, com `alternativas`, índice numérico `correta` e `resolucao`, corrigida automaticamente.
+- `tipo: 'sequencia'`, com `itens`, `valoresResposta`, `respostasCorretas` e `resolucao`, corrigida automaticamente quando a sequência inteira coincide.
+- `tipo: 'aberta'`, com `enunciado` e `resolucao`. O aluno escreve, confere a resolução e marca “Consegui resolver” ou “Preciso revisar”. A avaliação desta questão é manual pelo aluno; o resultado final inclui essa autoavaliação.
 
-O progresso permanece no `localStorage` do navegador e não é sincronizado entre aparelhos.
+A revisão da Luiza usa `versao: 2`, porque seu conteúdo foi substituído. Isso inicia um novo progresso local, sem misturar respostas de versões diferentes. As atividades do Anderson usam uma chave separada.
 
-**Compatibilidade:** Giovana mantém o identificador interno `jovana` para preservar os links e o progresso salvos anteriormente no navegador.
+**Compatibilidade:** Giovana mantém o identificador interno `jovana`, preservando possíveis links antigos.
 
 ## Importante sobre resultados
 
