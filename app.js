@@ -92,7 +92,9 @@ function initHome() {
     const state = loadState(aluno.id, capitulo.id);
     const respondidas = Math.min(state.respostas.length, capitulo.questoes.length);
     const mensagem = state.concluido
-      ? `Revisão concluída · ${countCorrect(capitulo, state)} de ${capitulo.questoes.length} acertos`
+      ? capitulo.questoes.some(q => q.tipo === 'aberta')
+        ? `Revisão concluída · ${countCorrect(capitulo, state)} de ${capitulo.questoes.length} resolvidas na autoavaliação`
+        : `Revisão concluída · ${countCorrect(capitulo, state)} de ${capitulo.questoes.length} acertos`
       : respondidas > 0 ? `${respondidas} de ${capitulo.questoes.length} questões respondidas` : 'Atividades disponíveis';
     const a = elem('a', `aluno-card aluno-${aluno.cor}`);
     a.href = rota('capitulos', aluno.id);
