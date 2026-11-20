@@ -234,7 +234,7 @@ function initQuiz() {
     botaoConfirmar.hidden = confirmed;
     botaoConfirmar.disabled = aberta ? !textarea.value.trim() : selected === null;
     botaoProximo.hidden = !confirmed;
-    botaoProximo.disabled = aberta && !resposta.avaliacao;
+    botaoProximo.disabled = aberta ? !(confirmed && resposta.avaliacao) : false;
     botaoProximo.innerHTML = index === total - 1 ? `Ver meu resultado ${svgIcon('arrow', 18)}` : `Próxima questão ${svgIcon('arrow', 18)}`;
     feedback.hidden = !confirmed;
     if (confirmed) {
