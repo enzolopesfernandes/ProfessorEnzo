@@ -14,6 +14,10 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 function getAluno(id) { return ALUNOS.find(item => item.id === id) || null; }
 function getCapitulo(id) { return CHAPTERS.find(item => item.id === id) || null; }
+function getCapitulosAluno(aluno) {
+  if (!aluno) return [];
+  return CHAPTERS.filter(capitulo => !capitulo.alunos || capitulo.alunos.includes(aluno.id)).reverse();
+}
 function getParams() { return new URLSearchParams(window.location.search); }
 function rota(pagina, aluno, capitulo = CHAPTERS[0]?.id || 'revisao-final') {
   if (pagina === 'index') return 'index.html';
@@ -39,7 +43,13 @@ function resetState(aluno, capitulo) {
   return state;
 }
 function countCorrect(capitulo, state) {
-  return capitulo.questoes.reduce((total, q, index) => total + (state.respostas[index] === q.correta ? 1 : 0), 0);
+  return capitulo.questoes.reduce((total, q, index) => {
+    const resposta = state.respostas[index];
+    const acertou = q.tipo === 'aberta'
+      ? resposta && resposta.avaliacao === 'acertou'
+      : resposta === q.correta;
+    return total + (acertou ? 1 : 0);
+  }, 0);
 }
 function elem(tag, className, content) {
   const element = document.createElement(tag);
@@ -64,7 +74,8 @@ function svgIcon(name, size = 20) {
 function getContext() {
   const p = getParams();
   const aluno = getAluno(p.get('aluno'));
-  const capitulo = getCapitulo(p.get('capitulo')) || CHAPTERS[0];
+  const disponiveis = getCapitulosAluno(aluno);
+  const capitulo = disponiveis.find(item => item.id === p.get('capitulo')) || disponiveis[0];
   if (!aluno || !capitulo) { window.location.replace('index.html'); return null; }
   return { aluno, capitulo };
 }
@@ -77,7 +88,7 @@ function setNomeAluno(aluno) {
 function initHome() {
   const container = $('#alunos-grid');
   for (const aluno of ALUNOS) {
-    const capitulo = CHAPTERS[0];
+    const capitulo = getCapitulosAluno(aluno)[0];
     const state = loadState(aluno.id, capitulo.id);
     const respondidas = Math.min(state.respostas.length, capitulo.questoes.length);
     const mensagem = state.concluido
@@ -92,28 +103,43 @@ function initHome() {
   }
 }
 
+
 function initCapitulos() {
   const ctx = getContext(); if (!ctx) return;
-  const { aluno, capitulo } = ctx;
+  const { aluno } = ctx;
   setNomeAluno(aluno);
-  const state = loadState(aluno.id, capitulo.id);
-  const total = capitulo.questoes.length;
-  const respondidas = Math.min(state.respostas.length, total);
-  $('#capitulo-titulo').textContent = capitulo.titulo;
-  $('#capitulo-subtitulo').textContent = capitulo.subtitulo;
-  $('#capitulo-descricao').textContent = capitulo.descricao;
-  $('#total-questoes').textContent = String(total).padStart(2, '0');
-  $('#progresso-texto').textContent = state.concluido ? 'Revisão concluída' : respondidas ? `${respondidas} de ${total} respondidas` : 'Ainda não iniciada';
-  $('#progresso-barra').style.width = `${(respondidas / Math.max(total, 1)) * 100}%`;
-  const iniciar = $('#iniciar-quiz');
-  iniciar.href = rota('quiz', aluno.id, capitulo.id);
-  $('#iniciar-texto').textContent = state.concluido ? 'Refazer questões' : respondidas ? 'Continuar revisão' : 'Começar revisão';
-  if (state.concluido) {
-    $('#ver-resultado').hidden = false;
-    $('#ver-resultado').href = rota('resultado', aluno.id, capitulo.id);
-    iniciar.addEventListener('click', () => resetState(aluno.id, capitulo.id));
+  const lista = $('#capitulos-lista');
+  const capitulos = getCapitulosAluno(aluno);
+  for (const capitulo of capitulos) {
+    const state = loadState(aluno.id, capitulo.id);
+    const total = capitulo.questoes.length;
+    const respondidas = Math.min(state.respostas.length, total);
+    const progresso = Math.round(respondidas / Math.max(total, 1) * 100);
+    const card = elem('article', 'chapter-card');
+    card.innerHTML = '<div class="chapter-top"><span class="chapter-tag"></span></div><h2 class="chapter-name"></h2><p class="chapter-subtitle"></p><p class="chapter-desc"></p><div class="chapter-info"><span class="chapter-total"></span><span>Correção comentada</span></div><div class="progress-metadata"><strong>Seu progresso</strong><span class="chapter-progress-text"></span></div><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill"></div></div><div class="chapter-actions"><a class="btn btn-primary chapter-start" href="#"></a><a class="btn btn-outline chapter-result" href="#" hidden>Ver resultado</a></div>';
+    $('.chapter-tag', card).textContent = capitulo.id === 'revisao-final' ? 'Atividade de exemplo' : 'Matemática · 7º ano';
+    $('.chapter-name', card).textContent = capitulo.titulo;
+    $('.chapter-subtitle', card).textContent = capitulo.subtitulo;
+    $('.chapter-desc', card).textContent = capitulo.descricao;
+    $('.chapter-total', card).textContent = `${total} questões`;
+    $('.chapter-progress-text', card).textContent = state.concluido ? 'Concluída' : respondidas ? `${respondidas} de ${total} respondidas` : 'Ainda não iniciada';
+    const bar = $('.progress-track', card);
+    bar.setAttribute('aria-label', `Progresso de ${capitulo.titulo}`);
+    bar.setAttribute('aria-valuenow', String(progresso));
+    $('.progress-fill', card).style.width = `${progresso}%`;
+    const iniciar = $('.chapter-start', card);
+    iniciar.href = rota('quiz', aluno.id, capitulo.id);
+    iniciar.textContent = state.concluido ? 'Refazer questões' : respondidas ? 'Continuar revisão' : 'Começar revisão';
+    if (state.concluido) {
+      const ver = $('.chapter-result', card);
+      ver.hidden = false;
+      ver.href = rota('resultado', aluno.id, capitulo.id);
+      iniciar.addEventListener('click', () => resetState(aluno.id, capitulo.id));
+    }
+    lista.append(card);
   }
 }
+
 
 function initQuiz() {
   const ctx = getContext(); if (!ctx) return;
@@ -128,6 +154,11 @@ function initQuiz() {
   let selected = null;
   $('#quiz-titulo').textContent = capitulo.titulo;
   const optionsContainer = $('#opcoes');
+  const answerWrap = $('#resposta-aberta-wrap');
+  const textarea = $('#resposta-texto');
+  const selfCheck = $('#autoavaliacao');
+  const btnAcertou = $('#avaliei-certo');
+  const btnRevisar = $('#avaliei-revisar');
   const feedback = $('#feedback');
   const botaoConfirmar = $('#confirmar-resposta');
   const botaoProximo = $('#proxima-questao');
@@ -135,67 +166,135 @@ function initQuiz() {
   function render() {
     const index = state.indice;
     const questao = capitulo.questoes[index];
-    const confirmed = Number.isInteger(state.respostas[index]);
-    selected = confirmed ? state.respostas[index] : null;
+    const aberta = questao.tipo === 'aberta';
+    const resposta = state.respostas[index];
+    const confirmed = aberta
+      ? !!(resposta && typeof resposta === 'object' && typeof resposta.texto === 'string')
+      : Number.isInteger(resposta);
+    selected = aberta ? null : confirmed ? resposta : null;
     $('#questao-numero').textContent = String(index + 1).padStart(2, '0');
     $('#questao-contador').textContent = `Questão ${index + 1} de ${total}`;
     $('#progresso-quiz').style.width = `${(state.respostas.length / total) * 100}%`;
     $('#tema-questao').textContent = questao.assunto;
     $('#questao-enunciado').textContent = questao.enunciado;
+
+    const subitens = $('#questao-subitens');
+    subitens.replaceChildren();
+    const temSubitens = Array.isArray(questao.subitens) && questao.subitens.length > 0;
+    subitens.hidden = !temSubitens;
+    if (temSubitens) questao.subitens.forEach(item => subitens.append(elem('li', '', item.replace(/^[a-h]\)\s*/, ''))));
+    if (typeof window.renderGraficoQuestao === 'function') {
+      window.renderGraficoQuestao($('#grafico-questao'), questao.grafico);
+    } else {
+      $('#grafico-questao').hidden = true;
+    }
+
+    optionsContainer.hidden = aberta;
+    answerWrap.hidden = !aberta;
+    selfCheck.hidden = !aberta || !confirmed;
     optionsContainer.replaceChildren();
-    questao.alternativas.forEach((resposta, idx) => {
-      const button = elem('button', 'opcao');
-      button.type = 'button';
-      button.innerHTML = `<span class="opcao-letra">${String.fromCharCode(65 + idx)}</span><span class="opcao-texto"></span><span class="opcao-indicador"></span>`;
-      $('.opcao-texto', button).textContent = resposta;
-      button.setAttribute('aria-pressed', String(idx === selected));
-      if (selected === idx) button.classList.add('is-selected');
-      if (confirmed) {
-        button.disabled = true;
-        if (idx === questao.correta) {
-          button.classList.add('is-correct');
-          $('.opcao-indicador', button).innerHTML = svgIcon('check', 18);
-        } else if (idx === selected) {
-          button.classList.add('is-wrong');
-          $('.opcao-indicador', button).innerHTML = svgIcon('x', 18);
-        }
-      } else {
-        button.addEventListener('click', () => {
-          selected = idx;
-          $$('.opcao', optionsContainer).forEach((option, i) => {
-            option.classList.toggle('is-selected', i === idx);
-            option.setAttribute('aria-pressed', String(i === idx));
+    if (aberta) {
+      textarea.value = confirmed ? resposta.texto : '';
+      textarea.disabled = confirmed;
+      btnAcertou.setAttribute('aria-pressed', String(!!(confirmed && resposta.avaliacao === 'acertou')));
+      btnRevisar.setAttribute('aria-pressed', String(!!(confirmed && resposta.avaliacao === 'revisar')));
+      botaoConfirmar.innerHTML = `Conferir resposta ${svgIcon('arrow', 18)}`;
+    } else {
+      botaoConfirmar.innerHTML = `Confirmar resposta ${svgIcon('arrow', 18)}`;
+      questao.alternativas.forEach((alternativa, idx) => {
+        const button = elem('button', 'opcao');
+        button.type = 'button';
+        button.innerHTML = '<span class="opcao-letra"></span><span class="opcao-texto"></span><span class="opcao-indicador"></span>';
+        $('.opcao-letra', button).textContent = String.fromCharCode(65 + idx);
+        $('.opcao-texto', button).textContent = alternativa;
+        button.setAttribute('aria-pressed', String(idx === selected));
+        if (selected === idx) button.classList.add('is-selected');
+        if (confirmed) {
+          button.disabled = true;
+          if (idx === questao.correta) {
+            button.classList.add('is-correct');
+            $('.opcao-indicador', button).innerHTML = svgIcon('check', 18);
+          } else if (idx === selected) {
+            button.classList.add('is-wrong');
+            $('.opcao-indicador', button).innerHTML = svgIcon('x', 18);
+          }
+        } else {
+          button.addEventListener('click', () => {
+            selected = idx;
+            $$('.opcao', optionsContainer).forEach((option, i) => {
+              option.classList.toggle('is-selected', i === idx);
+              option.setAttribute('aria-pressed', String(i === idx));
+            });
+            botaoConfirmar.disabled = false;
           });
-          botaoConfirmar.disabled = false;
-        });
-      }
-      optionsContainer.append(button);
-    });
+        }
+        optionsContainer.append(button);
+      });
+    }
     botaoConfirmar.hidden = confirmed;
-    botaoConfirmar.disabled = selected === null;
+    botaoConfirmar.disabled = aberta ? !textarea.value.trim() : selected === null;
     botaoProximo.hidden = !confirmed;
+    botaoProximo.disabled = aberta && !resposta.avaliacao;
     botaoProximo.innerHTML = index === total - 1 ? `Ver meu resultado ${svgIcon('arrow', 18)}` : `Próxima questão ${svgIcon('arrow', 18)}`;
     feedback.hidden = !confirmed;
     if (confirmed) {
-      const acertou = selected === questao.correta;
-      feedback.className = `feedback ${acertou ? 'feedback-certo' : 'feedback-errado'}`;
-      $('#feedback-icone').innerHTML = svgIcon(acertou ? 'check' : 'x', 19);
-      $('#feedback-titulo').textContent = acertou ? 'Muito bem! Você acertou.' : 'Ainda não! Vamos entender.';
-      $('#feedback-descricao').textContent = acertou
-        ? 'Confira a resolução para reforçar o aprendizado.'
-        : `Resposta correta: ${String.fromCharCode(65 + questao.correta)}. ${questao.alternativas[questao.correta]}`;
+      if (aberta) {
+        feedback.className = 'feedback feedback-neutro';
+        $('#feedback-icone').innerHTML = svgIcon('book', 19);
+        $('#feedback-titulo').textContent = 'Confira a resolução';
+        $('#feedback-descricao').textContent = 'Compare com o que você escreveu e indique como se saiu.';
+      } else {
+        const acertou = selected === questao.correta;
+        feedback.className = `feedback ${acertou ? 'feedback-certo' : 'feedback-errado'}`;
+        $('#feedback-icone').innerHTML = svgIcon(acertou ? 'check' : 'x', 19);
+        $('#feedback-titulo').textContent = acertou ? 'Muito bem! Você acertou.' : 'Ainda não! Vamos entender.';
+        $('#feedback-descricao').textContent = acertou
+          ? 'Confira a resolução para reforçar o aprendizado.'
+          : `Resposta correta: ${String.fromCharCode(65 + questao.correta)}. ${questao.alternativas[questao.correta]}`;
+      }
       $('#resolucao').textContent = questao.resolucao;
     }
   }
+
+  textarea.addEventListener('input', () => {
+    const questao = capitulo.questoes[state.indice];
+    if (questao.tipo === 'aberta' && !state.respostas[state.indice]) {
+      botaoConfirmar.disabled = !textarea.value.trim();
+    }
+  });
+  for (const [botao, avaliacao] of [[btnAcertou, 'acertou'], [btnRevisar, 'revisar']]) {
+    botao.addEventListener('click', () => {
+      const questao = capitulo.questoes[state.indice];
+      const resposta = state.respostas[state.indice];
+      if (questao.tipo !== 'aberta' || !resposta || typeof resposta !== 'object') return;
+      resposta.avaliacao = avaliacao;
+      saveState(aluno.id, capitulo.id, state);
+      render();
+    });
+  }
+
   botaoConfirmar.addEventListener('click', () => {
-    if (selected === null || Number.isInteger(state.respostas[state.indice])) return;
-    state.respostas[state.indice] = selected;
+    const questao = capitulo.questoes[state.indice];
+    if (state.respostas[state.indice] !== undefined) return;
+    if (questao.tipo === 'aberta') {
+      const texto = textarea.value.trim();
+      if (!texto) return;
+      state.respostas[state.indice] = { texto, avaliacao: null };
+    } else {
+      if (selected === null) return;
+      state.respostas[state.indice] = selected;
+    }
     saveState(aluno.id, capitulo.id, state);
     render();
     feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
   botaoProximo.addEventListener('click', () => {
-    if (!Number.isInteger(state.respostas[state.indice])) return;
+    const questao = capitulo.questoes[state.indice];
+    const resposta = state.respostas[state.indice];
+    const answered = questao.tipo === 'aberta'
+      ? !!(resposta && resposta.avaliacao)
+      : Number.isInteger(resposta);
+    if (!answered) return;
     if (state.indice === total - 1) {
       state.concluido = true;
       state.indice = total;
@@ -222,27 +321,36 @@ function initResultado() {
   }
   const acertos = countCorrect(capitulo, state);
   const erros = total - acertos;
+  const aberta = capitulo.questoes.some(questao => questao.tipo === 'aberta');
   const percentual = Math.round((acertos / Math.max(total, 1)) * 100);
+  if (aberta) {
+    $('#rotulo-percentual').textContent = 'na sua autoavaliação';
+    $('#rotulo-acertos').textContent = 'Consegui resolver';
+    $('#rotulo-erros').textContent = 'Preciso revisar';
+  }
   $('#score-percentual').textContent = `${percentual}%`;
   $('#score-circulo').style.setProperty('--percentual', `${percentual}%`);
   $('#score-acertos').textContent = String(acertos);
   $('#score-erros').textContent = String(erros);
   $('#score-total').textContent = String(total);
-  $('#mensagem-resultado').textContent = percentual === 100
-    ? 'Excelente! Você acertou todas as questões.'
+  $('#mensagem-resultado').textContent = aberta
+    ? 'Sua autoavaliação ajuda a identificar o que revisar.'
+    : percentual === 100 ? 'Excelente! Você acertou todas as questões.'
     : percentual >= 70 ? 'Ótimo trabalho! Continue praticando.'
     : 'Cada questão é uma chance de aprender mais.';
   const lista = $('#lista-revisao');
   capitulo.questoes.forEach((questao, index) => {
-    const isCorrect = state.respostas[index] === questao.correta;
+    const resposta = state.respostas[index];
+    const isOpen = questao.tipo === 'aberta';
+    const isCorrect = isOpen ? resposta.avaliacao === 'acertou' : resposta === questao.correta;
     const item = elem('details', `resumo-questao ${isCorrect ? 'resumo-certo' : 'resumo-errado'}`);
     const summary = elem('summary', 'resumo-cabecalho');
-    summary.innerHTML = `<span class="resumo-status">${svgIcon(isCorrect ? 'check' : 'x', 16)}</span><span class="resumo-titulo"></span><span class="resumo-badge">${isCorrect ? 'Correta' : 'Incorreta'}</span><span class="resumo-chevron">⌄</span>`;
+    summary.innerHTML = `<span class="resumo-status">${svgIcon(isCorrect ? 'check' : 'x', 16)}</span><span class="resumo-titulo"></span><span class="resumo-badge">${isOpen ? (isCorrect ? 'Resolvida' : 'Revisar') : (isCorrect ? 'Correta' : 'Incorreta')}</span><span class="resumo-chevron">⌄</span>`;
     $('.resumo-titulo', summary).textContent = `Questão ${String(index + 1).padStart(2, '0')} · ${questao.assunto}`;
     const body = elem('div', 'resumo-conteudo');
     const question = elem('p', 'resumo-enunciado', questao.enunciado);
-    const sua = elem('p', '', `Sua resposta: ${questao.alternativas[state.respostas[index]]}`);
-    const certa = elem('p', '', `Resposta correta: ${questao.alternativas[questao.correta]}`);
+    const sua = elem('p', 'resumo-sua-resposta', isOpen ? `Sua resposta: ${resposta.texto}` : `Sua resposta: ${questao.alternativas[resposta]}`);
+    const certa = isOpen ? elem('p', '', 'Resolução comentada:') : elem('p', '', `Resposta correta: ${questao.alternativas[questao.correta]}`);
     const resolucao = elem('p', 'resumo-explicacao', questao.resolucao);
     body.append(question, sua, certa, resolucao);
     item.append(summary, body);
