@@ -4,7 +4,7 @@ Protótipo funcional, responsivo e 100% estático, pronto para GitHub + Netlify.
 
 ## Telas
 
-- `index.html` — Escolha entre Anderson, Luiza e Jovana.
+- `index.html` — Escolha entre Anderson, Luiza e Giovana.
 - `capitulos.html` — Capítulos disponíveis e progresso de cada aluno.
 - `quiz.html` — Questões com correção imediata e resolução, acertando ou errando.
 - `resultado.html` — Aproveitamento, acertos, erros e revisão de cada questão.
@@ -32,6 +32,8 @@ Abra o arquivo `questions.js`. Dentro de `window.CHAPTERS`, cada capítulo tem `
 ```
 
 Para adicionar novos capítulos, inclua novos objetos no array `window.CHAPTERS`. **A tela de capítulos do protótipo foi projetada para um capítulo inicial**. A estrutura do arquivo aceita mais capítulos, mas será necessário atualizar a interface de listagem para exibir os novos capítulos.
+
+**Compatibilidade:** Giovana mantém o identificador interno `jovana` para preservar os links e o progresso salvos anteriormente no navegador.
 
 ## Importante sobre resultados
 
