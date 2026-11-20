@@ -39,6 +39,10 @@ A revisão da Luiza usa `versao: 2`, porque seu conteúdo foi substituído. Isso
 
 **Compatibilidade:** Giovana mantém o identificador interno `jovana`, preservando possíveis links antigos.
 
+## Verificar questões
+
+Execute `node tests/validar-questoes.cjs` no repositório para validar quantidade, IDs, tipos, respostas, gráficos e exclusividade por aluno. O site continua estático e dispensa build.
+
 ## Importante sobre resultados
 
 Os resultados ficam salvos **apenas no armazenamento local (localStorage) do navegador e do aparelho em que o quiz foi respondido**. Não há banco de dados nem login. Os resultados NÃO são enviados automaticamente ao professor, nem sincronizados entre dispositivos. Este é um protótipo para prática e validação visual. Para acompanhar notas remotamente, use um banco de dados e autenticação (por exemplo, Supabase ou Firebase) e cuide da privacidade de menores, quando aplicável.
