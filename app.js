@@ -47,6 +47,14 @@ function resetState(aluno, capitulo) {
   saveState(aluno, capitulo, state);
   return state;
 }
+function confirmarReinicio(aluno, capitulo) {
+  const titulo = getCapitulo(capitulo)?.titulo || 'esta atividade';
+  if (!window.confirm(`Reiniciar "${titulo}"? Todas as respostas e o progresso desta atividade serão apagados neste navegador. Esta ação não pode ser desfeita.`)) {
+    return false;
+  }
+  resetState(aluno, capitulo);
+  return true;
+}
 function countCorrect(capitulo, state) {
   return capitulo.questoes.reduce((total, q, index) => {
     const resposta = state.respostas[index];
@@ -131,7 +139,7 @@ function initCapitulos() {
     const respondidas = Math.min(state.respostas.length, total);
     const progresso = Math.round(respondidas / Math.max(total, 1) * 100);
     const card = elem('article', 'chapter-card');
-    card.innerHTML = '<div class="chapter-top"><span class="chapter-tag"></span></div><h2 class="chapter-name"></h2><p class="chapter-subtitle"></p><p class="chapter-desc"></p><div class="chapter-info"><span class="chapter-total"></span><span>Correção comentada</span></div><div class="progress-metadata"><strong>Seu progresso</strong><span class="chapter-progress-text"></span></div><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill"></div></div><div class="chapter-actions"><a class="btn btn-primary chapter-start" href="#"></a><a class="btn btn-outline chapter-result" href="#" hidden>Ver resultado</a></div>';
+    card.innerHTML = '<div class="chapter-top"><span class="chapter-tag"></span></div><h2 class="chapter-name"></h2><p class="chapter-subtitle"></p><p class="chapter-desc"></p><div class="chapter-info"><span class="chapter-total"></span><span>Correção comentada</span></div><div class="progress-metadata"><strong>Seu progresso</strong><span class="chapter-progress-text"></span></div><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill"></div></div><div class="chapter-actions"><a class="btn btn-primary chapter-start" href="#"></a><button type="button" class="btn btn-outline chapter-reset" hidden>Reiniciar atividade</button></div>';
     $('.chapter-tag', card).textContent = capitulo.subtitulo || 'Atividade';
     $('.chapter-name', card).textContent = capitulo.titulo;
     $('.chapter-subtitle', card).textContent = capitulo.subtitulo;
@@ -144,12 +152,17 @@ function initCapitulos() {
     $('.progress-fill', card).style.width = `${progresso}%`;
     const iniciar = $('.chapter-start', card);
     iniciar.href = rota('quiz', aluno.id, capitulo.id);
-    iniciar.textContent = state.concluido ? 'Refazer questões' : respondidas ? 'Continuar revisão' : 'Começar revisão';
-    if (state.concluido) {
-      const ver = $('.chapter-result', card);
-      ver.hidden = false;
-      ver.href = rota('resultado', aluno.id, capitulo.id);
-      iniciar.addEventListener('click', () => resetState(aluno.id, capitulo.id));
+    iniciar.textContent = state.concluido ? 'Ver resultado' : respondidas ? 'Continuar revisão' : 'Começar revisão';
+    if (state.concluido) iniciar.href = rota('resultado', aluno.id, capitulo.id);
+    const reiniciar = $('.chapter-reset', card);
+    if (respondidas > 0 || state.concluido) {
+      reiniciar.hidden = false;
+      reiniciar.setAttribute('aria-label', `Reiniciar ${capitulo.titulo}`);
+      reiniciar.addEventListener('click', () => {
+        if (confirmarReinicio(aluno.id, capitulo.id)) {
+          window.location.href = rota('quiz', aluno.id, capitulo.id);
+        }
+      });
     }
     lista.append(card);
   }
@@ -179,6 +192,12 @@ function initQuiz() {
   const feedback = $('#feedback');
   const botaoConfirmar = $('#confirmar-resposta');
   const botaoProximo = $('#proxima-questao');
+  const botaoReiniciar = $('#reiniciar-quiz');
+  botaoReiniciar.addEventListener('click', () => {
+    if (confirmarReinicio(aluno.id, capitulo.id)) {
+      window.location.href = rota('quiz', aluno.id, capitulo.id);
+    }
+  });
 
   function render() {
     const index = state.indice;
@@ -194,6 +213,7 @@ function initQuiz() {
     selected = aberta || sequencia ? null : confirmed ? resposta : null;
     $('#questao-numero').textContent = String(index + 1).padStart(2, '0');
     $('#questao-contador').textContent = `Questão ${index + 1} de ${total}`;
+    botaoReiniciar.hidden = !state.respostas.length && state.indice === 0;
     $('#progresso-quiz').style.width = `${(state.respostas.length / total) * 100}%`;
     $('#tema-questao').textContent = questao.assunto;
     $('#questao-enunciado').textContent = questao.enunciado;
@@ -426,8 +446,9 @@ function initResultado() {
   });
   $('#voltar-capitulos').href = rota('capitulos', aluno.id, capitulo.id);
   $('#tentar-novamente').addEventListener('click', () => {
-    resetState(aluno.id, capitulo.id);
-    window.location.href = rota('quiz', aluno.id, capitulo.id);
+    if (confirmarReinicio(aluno.id, capitulo.id)) {
+      window.location.href = rota('quiz', aluno.id, capitulo.id);
+    }
   });
 }
 
