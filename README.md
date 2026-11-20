@@ -31,7 +31,15 @@ Abra o arquivo `questions.js`. Dentro de `window.CHAPTERS`, cada capítulo tem `
 }
 ```
 
-Para adicionar novos capítulos, inclua novos objetos no array `window.CHAPTERS`. **A tela de capítulos do protótipo foi projetada para um capítulo inicial**. A estrutura do arquivo aceita mais capítulos, mas será necessário atualizar a interface de listagem para exibir os novos capítulos.
+Para adicionar novos capítulos, inclua novos objetos no array `window.CHAPTERS` ou em um arquivo adicional carregado após `questions.js`. A página de capítulos agora lista automaticamente as atividades disponíveis. Um capítulo com `alunos: ['luiza']` será exibido apenas para Luiza; sem esse campo, ficará disponível para todos os alunos.
+
+### Revisão de Luiza — prova 23/11
+
+A atividade de Matemática do 7º ano fica em `questions-luiza-23-11.js` e reúne 40 questões originais, com subitens e resolução comentada. Os sete gráficos são renderizados por `graficos.js`, com uma tabela opcional de dados para acessibilidade.
+
+As questões discursivas usam `tipo: 'aberta'`. A estudante escreve a resposta, confere a resolução e marca **Consegui resolver** ou **Preciso revisar**. O percentual final dessas questões é **autoavaliado**, e não uma nota atribuída automaticamente. As questões de múltipla escolha continuam com correção automática.
+
+O progresso permanece no `localStorage` do navegador e não é sincronizado entre aparelhos.
 
 **Compatibilidade:** Giovana mantém o identificador interno `jovana` para preservar os links e o progresso salvos anteriormente no navegador.
 
