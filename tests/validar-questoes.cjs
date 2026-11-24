@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const sandbox = { window: {} };
 vm.createContext(sandbox);
-for (const file of ['questions-luiza-23-11.js', 'questions-anderson-23-11.js']) {
+for (const file of ['questions-luiza-23-11.js', 'questions-anderson-historia.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), sandbox, { filename: file });
 }
 const chapters = sandbox.window.CHAPTERS || [];
@@ -19,7 +19,8 @@ for (const chapter of chapters) {
   if (!chapter.id || chapterIds.has(chapter.id)) fail('ID de capítulo duplicado/inválido.');
   chapterIds.add(chapter.id);
   if (!Array.isArray(chapter.alunos) || chapter.alunos.length !== 1) fail('Atividade sem aluno exclusivo: ' + chapter.id);
-  if (!Array.isArray(chapter.questoes) || chapter.questoes.length !== 40) fail('Deve haver 40 questões em ' + chapter.id);
+  const esperado = chapter.alunos[0] === 'luiza' ? 40 : chapter.alunos[0] === 'anderson' ? 30 : null;
+  if (!Array.isArray(chapter.questoes) || chapter.questoes.length !== esperado) fail('Quantidade incorreta em ' + chapter.id);
   for (const [index, question] of chapter.questoes.entries()) {
     if (!question.id || questionIds.has(question.id)) fail('ID de questão duplicado/inválido: ' + question.id);
     questionIds.add(question.id);
@@ -38,8 +39,10 @@ for (const chapter of chapters) {
       fail('Gráfico inconsistente: ' + question.id);
   }
 }
-if (questionIds.size !== 80) fail('Quantidade total diferente de 80.');
+if (questionIds.size !== 70) fail('Quantidade total diferente de 70.');
 if (chapters.find(c => c.alunos[0] === 'luiza')?.versao !== 2) fail('Revisão da Luiza precisa da versão 2.');
-if (!chapters.some(c => c.alunos[0] === 'anderson')) fail('Revisão de Anderson ausente.');
+const anderson = chapters.find(c => c.alunos[0] === 'anderson');
+if (!anderson || anderson.id !== 'revisao-historia-6ano') fail('Revisão de História de Anderson ausente.');
+if (fs.existsSync(path.join(root, 'questions-anderson-23-11.js'))) fail('Arquivo antigo de Matemática de Anderson ainda existe.');
 if (fs.existsSync(path.join(root, 'questions.js'))) fail('Arquivo de testes ainda existe.');
-console.log('OK: 2 capítulos, 80 questões, IDs únicos, tipos, gabaritos e gráficos válidos.');
+console.log('OK: História de Anderson (30), Matemática de Luiza (40), IDs únicos e estruturas válidas.');
