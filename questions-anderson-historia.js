@@ -51,7 +51,7 @@ window.CHAPTERS.push({
       "assunto": "Formação dos reinos medievais",
       "resolucao": "Sequência: V, V, F. Correção: a Igreja cristã continuou tendo grande influência na Europa ocidental medieval, inclusive na vida religiosa, política e cultural.",
       "tipo": "aberta",
-      "enunciado": "Sobre a formação dos reinos medievais, marque V (verdadeiro) ou F (falso). Corrija a afirmação falsa mais importante. ( ) O fim do Império Romano do Ocidente não significou o desaparecimento imediato da cultura romana. ( ) Os novos reinos receberam influências de diferentes tradições culturais. ( ) A Igreja cristã deixou de ter qualquer influência na Europa ocidental após 476."
+      "enunciado": "Sobre a formação dos reinos medievais, marque V (verdadeiro) ou F (falso). Corrija a afirmação falsa mais importante.\n( ) O fim do Império Romano do Ocidente não significou o desaparecimento imediato da cultura romana.\n( ) Os novos reinos receberam influências de diferentes tradições culturais.\n( ) A Igreja cristã deixou de ter qualquer influência na Europa ocidental após 476."
     },
     {
       "id": "anderson-hist-05",
@@ -122,14 +122,14 @@ window.CHAPTERS.push({
       "assunto": "Império Bizantino",
       "resolucao": "Sequência: V, V, F. Correção: Constantinopla foi capital do Império Romano do Oriente; o grego ganhou importância; o Império Bizantino sobreviveu a 476 e só teve sua capital conquistada pelos otomanos em 1453.",
       "tipo": "aberta",
-      "enunciado": "Sobre o Império Bizantino, marque V ou F e reescreva uma das afirmações falsas corretamente. ( ) Constantinopla foi a capital do Império Romano do Oriente. ( ) A língua grega ganhou grande importância na vida do Império Bizantino. ( ) O Império Bizantino deixou de existir no mesmo ano em que terminou o Império Romano do Ocidente."
+      "enunciado": "Sobre o Império Bizantino, marque V ou F e reescreva uma das afirmações falsas corretamente.\n( ) Constantinopla foi a capital do Império Romano do Oriente.\n( ) A língua grega ganhou grande importância na vida do Império Bizantino.\n( ) O Império Bizantino deixou de existir no mesmo ano em que terminou o Império Romano do Ocidente."
     },
     {
       "id": "anderson-hist-11",
       "assunto": "Império Bizantino",
       "resolucao": "a) Mosaicos são imagens ou padrões feitos com pequenas peças de materiais diferentes, combinadas para formar figuras. b) Podiam mostrar a importância do cristianismo e a autoridade ou o poder do imperador.",
       "tipo": "aberta",
-      "enunciado": "Leia o texto e responda. \"Em Constantinopla, igrejas e palácios eram decorados com mosaicos. Imagens religiosas e grandes construções mostravam a importância do cristianismo e o poder imperial.\" a) O que são mosaicos, em linhas gerais? b) Cite duas ideias que as construções e imagens podiam transmitir à população."
+      "enunciado": "Leia o texto e responda. \"Em Constantinopla, igrejas e palácios eram decorados com mosaicos. Imagens religiosas e grandes construções mostravam a importância do cristianismo e o poder imperial.\"\na) O que são mosaicos, em linhas gerais?\nb) Cite duas ideias que as construções e imagens podiam transmitir à população."
     },
     {
       "id": "anderson-hist-12",
@@ -186,7 +186,7 @@ window.CHAPTERS.push({
       "assunto": "Mundo feudal",
       "resolucao": "a) A atividade econômica é a agricultura. b) Entre as obrigações estão trabalhar alguns dias nas terras reservadas ao senhor e entregar parte da produção; a família também cultivava um lote para seu sustento.",
       "tipo": "aberta",
-      "enunciado": "Leia a situação histórica simplificada. \"Em alguns domínios rurais, uma família camponesa cultivava um lote para seu sustento e, em determinados dias, trabalhava nas terras reservadas ao senhor. Também podia entregar parte do que produzia.\" a) Qual atividade econômica aparece no texto? b) Identifique duas obrigações ou atividades desempenhadas pela família camponesa."
+      "enunciado": "Leia a situação histórica simplificada. \"Em alguns domínios rurais, uma família camponesa cultivava um lote para seu sustento e, em determinados dias, trabalhava nas terras reservadas ao senhor. Também podia entregar parte do que produzia.\"\na) Qual atividade econômica aparece no texto?\nb) Identifique duas obrigações ou atividades desempenhadas pela família camponesa."
     },
     {
       "id": "anderson-hist-17",
@@ -229,7 +229,7 @@ window.CHAPTERS.push({
       "assunto": "Mundo feudal",
       "resolucao": "Sequência: V, F, V. Correção: a agricultura tinha grande importância nos feudos, mas isso não significa ausência total de comércio; podiam existir trocas e atividades comerciais. As terras também incluíam construções e caminhos.",
       "tipo": "aberta",
-      "enunciado": "Julgue as afirmações sobre a economia de muitos domínios rurais medievais e corrija a falsa. ( ) A produção agrícola tinha grande importância. ( ) Nos feudos não existia nenhuma troca comercial, em lugar algum e em nenhum período. ( ) As terras podiam incluir campos, moradias, caminhos e outras instalações."
+      "enunciado": "Julgue as afirmações sobre a economia de muitos domínios rurais medievais e corrija a falsa.\n( ) A produção agrícola tinha grande importância.\n( ) Nos feudos não existia nenhuma troca comercial, em lugar algum e em nenhum período.\n( ) As terras podiam incluir campos, moradias, caminhos e outras instalações."
     },
     {
       "id": "anderson-hist-20",
@@ -264,21 +264,21 @@ window.CHAPTERS.push({
       "assunto": "Reinos, cristianismo e feudalismo",
       "resolucao": "Sequência: V, F, F. Justificativa da terceira: a sociedade medieval tinha grupos com condições e direitos diferentes, como nobres, clérigos e camponeses; não havia igualdade de oportunidades para todos. A vassalagem entre nobres não era igual à servidão camponesa.",
       "tipo": "aberta",
-      "enunciado": "Assinale V ou F nas afirmações seguintes e justifique a terceira. ( ) Em muitas regiões, os camponeses cultivavam parte importante dos alimentos consumidos. ( ) A vassalagem e a servidão eram exatamente a mesma relação social. ( ) Todos os moradores da Europa medieval tinham os mesmos direitos e oportunidades."
+      "enunciado": "Assinale V ou F nas afirmações seguintes e justifique a terceira.\n( ) Em muitas regiões, os camponeses cultivavam parte importante dos alimentos consumidos.\n( ) A vassalagem e a servidão eram exatamente a mesma relação social.\n( ) Todos os moradores da Europa medieval tinham os mesmos direitos e oportunidades."
     },
     {
       "id": "anderson-hist-24",
       "assunto": "Reinos, cristianismo e feudalismo",
       "resolucao": "a) O Império Bizantino preservou a continuidade do governo imperial romano no Oriente. b) Havia vários reinos e outras formas de poder, não um único governante de toda a Europa medieval.",
       "tipo": "aberta",
-      "enunciado": "Compare os dois espaços históricos usando a tabela e responda. Reinos ocidentais: novos poderes, como o reino dos francos, e mistura de costumes romanos e germânicos. Império Bizantino: continuidade da autoridade imperial no Oriente, com capital em Constantinopla e heranças romanas, gregas e cristãs. a) Qual dos dois preservou a continuidade de um governo imperial romano após 476? b) Por que é incorreto afirmar que todos os povos medievais viviam sob o mesmo governante?"
+      "enunciado": "Compare os dois espaços históricos usando a tabela e responda.\nReinos ocidentais: novos poderes, como o reino dos francos, e mistura de costumes romanos e germânicos.\nImpério Bizantino: continuidade da autoridade imperial no Oriente, com capital em Constantinopla e heranças romanas, gregas e cristãs.\na) Qual dos dois preservou a continuidade de um governo imperial romano após 476?\nb) Por que é incorreto afirmar que todos os povos medievais viviam sob o mesmo governante?"
     },
     {
       "id": "anderson-hist-25",
       "assunto": "Reinos, cristianismo e feudalismo",
       "resolucao": "a) A Igreja cristã. b) O rei podia obter apoio religioso e legitimidade; os religiosos recebiam proteção e condições para exercer sua atuação, fortalecendo a influência de ambos.",
       "tipo": "aberta",
-      "enunciado": "Leia o texto didático e responda. \"Um rei franco busca apoio de líderes religiosos, enquanto religiosos recebem proteção e espaço para atuar no reino. Esse tipo de aproximação podia fortalecer a autoridade dos dois lados.\" a) Qual instituição religiosa é destacada? b) Explique por que essa aproximação podia ser vantajosa para o rei e para os religiosos."
+      "enunciado": "Leia o texto didático e responda. \"Um rei franco busca apoio de líderes religiosos, enquanto religiosos recebem proteção e espaço para atuar no reino. Esse tipo de aproximação podia fortalecer a autoridade dos dois lados.\"\na) Qual instituição religiosa é destacada?\nb) Explique por que essa aproximação podia ser vantajosa para o rei e para os religiosos."
     },
     {
       "id": "anderson-hist-26",
@@ -331,7 +331,7 @@ window.CHAPTERS.push({
       "assunto": "Síntese histórica",
       "resolucao": "a) I — formação dos reinos medievais; II — Império Bizantino; III — mundo feudal. b) Exemplo: a situação II descreve Constantinopla, capital bizantina situada entre Europa e Ásia, importante para o comércio.",
       "tipo": "aberta",
-      "enunciado": "Leia estas três descrições e identifique o conteúdo histórico mais relacionado a cada uma: formação dos reinos medievais, Império Bizantino ou mundo feudal. I. Um governante amplia os domínios dos francos e se aproxima da Igreja cristã. II. Artesãos e comerciantes convivem em uma capital situada entre Europa e Ásia. III. Camponeses trabalham a terra e devem obrigações a um senhor rural. a) Associe I, II e III aos três conteúdos. b) Escolha uma das situações e explique sua resposta."
+      "enunciado": "Leia estas três descrições e identifique o conteúdo histórico mais relacionado a cada uma: formação dos reinos medievais, Império Bizantino ou mundo feudal.\nI. Um governante amplia os domínios dos francos e se aproxima da Igreja cristã.\nII. Artesãos e comerciantes convivem em uma capital situada entre Europa e Ásia.\nIII. Camponeses trabalham a terra e devem obrigações a um senhor rural.\na) Associe I, II e III aos três conteúdos.\nb) Escolha uma das situações e explique sua resposta."
     },
     {
       "id": "anderson-hist-30",
