@@ -19,7 +19,7 @@ Protótipo funcional, responsivo e 100% estático, pronto para GitHub + Netlify.
 ## Atividades ativas
 
 - **Luiza:** `questions-luiza-23-11.js` — “Revisão prova 23/11”, Matemática do 7º ano, 40 questões. Versão atualizada com 20 questões de múltipla escolha, 8 de associação/verdadeiro ou falso e 12 abertas, acompanhadas de gabarito comentado. Gráficos reconstruídos no `graficos.js`.
-- **Anderson:** `questions-anderson-23-11.js` — “Revisão Matemática (23/11)”, Matemática do 6º ano, 40 questões com cinco alternativas, gabarito e resolução. As figuras necessárias para questões que dependem de leitura visual são reconstruídas por `graficos.js`.
+- **Anderson:** `questions-anderson-historia.js` — “Revisão de História”, História do 6º ano, 30 questões dos capítulos 14 (formação dos reinos medievais), 15 (Império Bizantino) e 16 (mundo feudal). O capítulo anterior de Matemática foi retirado. Há 8 questões de múltipla escolha, 4 de associação e 18 discursivas, com resoluções orientativas preparadas a partir da atividade enviada (sem gabarito oficial anexo).
 - **Giovana:** perfil mantido, atualmente sem atividades; a interface informa que ainda não há atividades disponíveis.
 
 **As seis questões de teste foram removidas.** O antigo arquivo `questions.js` deixou de ser carregado.
@@ -35,7 +35,7 @@ Os formatos atuais são:
 - `tipo: 'sequencia'`, com `itens`, `valoresResposta`, `respostasCorretas` e `resolucao`, corrigida automaticamente quando a sequência inteira coincide.
 - `tipo: 'aberta'`, com `enunciado` e `resolucao`. O aluno escreve, confere a resolução e marca “Consegui resolver” ou “Preciso revisar”. A avaliação desta questão é manual pelo aluno; o resultado final inclui essa autoavaliação.
 
-A revisão da Luiza usa `versao: 2`, porque seu conteúdo foi substituído. Isso inicia um novo progresso local, sem misturar respostas de versões diferentes. As atividades do Anderson usam uma chave separada.
+A revisão da Luiza usa `versao: 2`, porque seu conteúdo foi substituído. Isso inicia um novo progresso local, sem misturar respostas de versões diferentes. A revisão de História do Anderson possui um identificador diferente do capítulo antigo, começando com o progresso zerado e sem afetar o progresso da Luiza.
 
 **Compatibilidade:** Giovana mantém o identificador interno `jovana`, preservando possíveis links antigos.
 
