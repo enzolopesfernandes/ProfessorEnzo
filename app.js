@@ -16,7 +16,7 @@ function getAluno(id) { return ALUNOS.find(item => item.id === id) || null; }
 function getCapitulo(id) { return CHAPTERS.find(item => item.id === id) || null; }
 function getCapitulosAluno(aluno) {
   if (!aluno) return [];
-  return CHAPTERS.filter(capitulo => !capitulo.alunos || capitulo.alunos.includes(aluno.id)).reverse();
+  return CHAPTERS.filter(capitulo => !capitulo.alunos || capitulo.alunos.includes(aluno.id));
 }
 function getParams() { return new URLSearchParams(window.location.search); }
 function rota(pagina, aluno, capitulo) {
