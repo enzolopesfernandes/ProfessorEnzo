@@ -18,11 +18,14 @@ Protótipo funcional, responsivo e 100% estático, pronto para GitHub + Netlify.
 
 ## Atividades ativas
 
-- **Luiza:** `questions-luiza-23-11.js` — “Revisão prova 23/11”, Matemática do 7º ano, 40 questões. Versão atualizada com 20 questões de múltipla escolha, 8 de associação/verdadeiro ou falso e 12 abertas, acompanhadas de gabarito comentado. Gráficos reconstruídos no `graficos.js`.
-- **Anderson:** `questions-anderson-historia.js` — “Revisão de História”, História do 6º ano, 30 questões dos capítulos 14 (formação dos reinos medievais), 15 (Império Bizantino) e 16 (mundo feudal). O capítulo anterior de Matemática foi retirado. Há 8 questões de múltipla escolha, 4 de associação e 18 discursivas, com resoluções orientativas preparadas a partir da atividade enviada (sem gabarito oficial anexo).
-- **Giovana:** perfil mantido, atualmente sem atividades; a interface informa que ainda não há atividades disponíveis.
+- **Luiza — Capítulo 7 (recuperação):** `questions-luiza-geografia-cap7.js`. Geografia do 7º ano — economia e setores econômicos no Brasil. 25 questões (10 de múltipla escolha, 3 de classificação/associação e 12 discursivas).
+- **Luiza — Capítulo 8 (recuperação):** `questions-luiza-geografia-cap8.js`. Geografia do 7º ano — o espaço rural brasileiro. 25 questões (8 de múltipla escolha, 2 de classificação/associação e 15 discursivas).
+- **Anderson:** perfil mantido, sem atividades cadastradas.
+- **Giovana:** perfil mantido, sem atividades cadastradas.
 
-**As seis questões de teste foram removidas.** O antigo arquivo `questions.js` deixou de ser carregado.
+As revisões anteriores de Matemática e História dos alunos foram excluídas do banco de questões do site. Cada recuperação da Luiza tem progresso próprio e pode ser reiniciada separadamente.
+
+Os enunciados foram transcritos da atividade de Geografia fornecida pelo professor, e as resoluções vêm do gabarito comentado correspondente. Os anos e percentuais pertencem ao material didático e não representam dados atuais de 2026.
 
 ## Adicionar novas atividades
 
@@ -35,13 +38,13 @@ Os formatos atuais são:
 - `tipo: 'sequencia'`, com `itens`, `valoresResposta`, `respostasCorretas` e `resolucao`, corrigida automaticamente quando a sequência inteira coincide.
 - `tipo: 'aberta'`, com `enunciado` e `resolucao`. O aluno escreve, confere a resolução e marca “Consegui resolver” ou “Preciso revisar”. A avaliação desta questão é manual pelo aluno; o resultado final inclui essa autoavaliação.
 
-A revisão da Luiza usa `versao: 2`, porque seu conteúdo foi substituído. Isso inicia um novo progresso local, sem misturar respostas de versões diferentes. A revisão de História do Anderson possui um identificador diferente do capítulo antigo, começando com o progresso zerado e sem afetar o progresso da Luiza.
+Os capítulos 7 e 8 possuem IDs diferentes dos anteriores e entre si, evitando que o progresso antigo seja misturado com as novas respostas. A seleção mostra os capítulos na ordem 7 e 8.
 
 **Compatibilidade:** Giovana mantém o identificador interno `jovana`, preservando possíveis links antigos.
 
 ## Verificar questões
 
-Execute `node tests/validar-questoes.cjs` no repositório para validar quantidade, IDs, tipos, respostas, gráficos e exclusividade por aluno. O site continua estático e dispensa build.
+Execute `node tests/validar-questoes.cjs` no repositório para validar os dois capítulos, as 50 questões, IDs, tipos, respostas, exclusividade por aluno e ausência dos bancos antigos. O site continua estático e dispensa build.
 
 ## Reiniciar uma atividade
 
